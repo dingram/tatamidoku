@@ -1,5 +1,6 @@
 package com.zombiesatemy.tatamidoku.cli;
 
+import com.zombiesatemy.tatamidoku.game.GameState;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -9,8 +10,6 @@ import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public final class CommandLineClient {
     private static final int NO_COMMAND = 0;
@@ -19,6 +18,8 @@ public final class CommandLineClient {
     private final Terminal mTerminal;
     private final LineReader mLineReader;
     private final PrintWriter mWriter;
+    private TextRenderer mRenderer;
+    private GameState mGameState;
 
     public static void main(String[] args) {
         try {
@@ -40,6 +41,8 @@ public final class CommandLineClient {
     }
 
     private void startREPL() throws Exception {
+        mRenderer = new TextRenderer(mTerminal);
+        mGameState = new GameState();
         try {
             runREPL();
         } finally {
@@ -53,10 +56,10 @@ public final class CommandLineClient {
             switch (readAndInterpretLine()) {
                 case NO_COMMAND:
                     break;
-                case EXIT:
-                    return;
                 case SUCCESS:
                     break;
+                case EXIT:
+                    return;
             }
         }
     }
@@ -81,9 +84,11 @@ public final class CommandLineClient {
     private boolean interpretCommand(String input) {
         try {
             if (input.equals("exit")) {
-              return false;
+                return false;
+            } else if (input.equals("print")) {
+                mRenderer.render(mGameState);
             } else {
-              mWriter.format("ERROR: Unknown meta command \"%s\"\n", input);
+              mWriter.format("ERROR: Unknown command \"%s\"\n", input);
             }
             mWriter.flush();
         } catch (Exception e) {
