@@ -3,22 +3,29 @@ package com.zombiesatemy.tatamidoku.game;
 import java.util.List;
 
 public class LayoutImpl implements Layout {
-    private final int mSideLength;
     private final int mGroupSize;
+    private final int mGroupCount;
+    private final int mSideLength;
 
-    public LayoutImpl(int sideLength, int groupSize) {
-        mSideLength = sideLength;
+    public LayoutImpl(int groupSize, int groupCount) {
         mGroupSize = groupSize;
-    }
-
-    @Override
-    public int getSideLength() {
-        return mSideLength;
+        mGroupCount = groupCount;
+        mSideLength = groupCount * groupSize;
     }
 
     @Override
     public int getGroupSize() {
         return mGroupSize;
+    }
+
+    @Override
+    public int getGroupCount() {
+        return mGroupCount;
+    }
+
+    @Override
+    public int getSideLength() {
+        return mSideLength;
     }
 
     @Override

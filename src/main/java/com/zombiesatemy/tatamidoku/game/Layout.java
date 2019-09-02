@@ -3,8 +3,9 @@ package com.zombiesatemy.tatamidoku.game;
 import java.util.List;
 
 public interface Layout {
-    int getSideLength();
+    int getGroupCount();
     int getGroupSize();
+    int getSideLength();
     List<Group> getGroups();
 
     interface Group {

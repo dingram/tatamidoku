@@ -45,8 +45,9 @@ public final class CommandLineClient {
     private void startREPL() throws Exception {
         mRenderer = new TextRenderer(mTerminal);
         mGameState = new GameState();
-        mGameState.setLayout(new LayoutImpl(6, 3));
-        mGameState.setPlacement(new PlacementImpl());
+        final LayoutImpl layout = new LayoutImpl(3, 2);
+        mGameState.setLayout(layout);
+        mGameState.setPlacement(new PlacementImpl(layout.getSideLength()));
         try {
             runREPL();
         } finally {
