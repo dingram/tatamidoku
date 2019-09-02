@@ -2,6 +2,7 @@ package com.zombiesatemy.tatamidoku.cli;
 
 import com.zombiesatemy.tatamidoku.game.GameState;
 import com.zombiesatemy.tatamidoku.game.LayoutImpl;
+import com.zombiesatemy.tatamidoku.game.Placement;
 import com.zombiesatemy.tatamidoku.game.PlacementImpl;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -9,6 +10,8 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.AttributedStringBuilder;
+import org.jline.utils.AttributedStyle;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -92,6 +95,7 @@ public final class CommandLineClient {
         try {
             final Scanner scanner = new Scanner(input);
             final String command = scanner.next();
+            final Placement prevPlacement = mGameState.getPlacement();
             switch (command) {
                 case "exit":
                     return false;
@@ -102,14 +106,23 @@ public final class CommandLineClient {
                     int column = scanner.nextInt();
                     int row = scanner.nextInt();
                     int value = scanner.nextInt();
-                    mGameState.setPlacement(mGameState.getPlacement().withValueAt(column, row, value));
+                    mGameState.setPlacement(prevPlacement.withValueAt(column, row, value));
+                    if (!mGameState.isValid()) {
+                        mWriter.println(
+                                new AttributedStringBuilder()
+                                        .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED).bold())
+                                        .append("Invalid move.")
+                                        .toAnsi(mTerminal)
+                        );
+                        mGameState.setPlacement(prevPlacement);
+                    }
                     break;
                 }
                 case "clear": {
                     if (scanner.hasNext()) {
                         int column = scanner.nextInt();
                         int row = scanner.nextInt();
-                        mGameState.setPlacement(mGameState.getPlacement().withNoValueAt(column, row));
+                        mGameState.setPlacement(prevPlacement.withNoValueAt(column, row));
                     } else {
                         // Reset the whole thing.
                         mGameState.setPlacement(PlacementImpl.fromSideLength(mGameState.getLayout().getSideLength()));
