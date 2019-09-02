@@ -6,6 +6,8 @@ public interface Placement {
     int getSideLength();
     int getValueAt(int column, int row);
     int[][] getAllValuesCopy();
+    Placement withNoValueAt(int column, int row);
+    Placement withValueAt(int column, int row, int value);
 
     class Builder {
         private final int[][] mValues;

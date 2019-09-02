@@ -46,4 +46,16 @@ public final class PlacementImpl implements Placement {
     public int[][] getAllValuesCopy() {
         return Arrays.stream(mValues).map(int[]::clone).toArray(int[][]::new);
     }
+
+    @Override
+    public Placement withNoValueAt(int column, int row) {
+        return withValueAt(column, row, 0);
+    }
+
+    @Override
+    public Placement withValueAt(int column, int row, int value) {
+        final int[][] values = getAllValuesCopy();
+        values[column][row] = value;
+        return fromValuesWithoutCopy(values);
+    }
 }
