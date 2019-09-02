@@ -55,7 +55,7 @@ public class TextRenderer {
         final AttributedStringBuilder builder = new AttributedStringBuilder();
 
         builder.style(AttributedStyle.DEFAULT.bold().foreground(AttributedStyle.RED))
-                .append("Rendering not supported yet.")
+                .append("⚠️ Group rendering not supported yet. ⚠️")
                 .style(AttributedStyle.DEFAULT)
                 .append("\n");
 
