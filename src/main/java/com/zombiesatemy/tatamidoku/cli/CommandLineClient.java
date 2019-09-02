@@ -47,7 +47,7 @@ public final class CommandLineClient {
         mGameState = new GameState();
         final LayoutImpl layout = new LayoutImpl(3, 2);
         mGameState.setLayout(layout);
-        mGameState.setPlacement(new PlacementImpl(layout.getSideLength()));
+        mGameState.setPlacement(PlacementImpl.fromSideLength(layout.getSideLength()));
         try {
             runREPL();
         } finally {
