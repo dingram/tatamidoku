@@ -1,6 +1,8 @@
 package com.zombiesatemy.tatamidoku.cli;
 
 import com.zombiesatemy.tatamidoku.game.GameState;
+import com.zombiesatemy.tatamidoku.game.LayoutImpl;
+import com.zombiesatemy.tatamidoku.game.PlacementImpl;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -43,6 +45,8 @@ public final class CommandLineClient {
     private void startREPL() throws Exception {
         mRenderer = new TextRenderer(mTerminal);
         mGameState = new GameState();
+        mGameState.setLayout(new LayoutImpl(6, 3));
+        mGameState.setPlacement(new PlacementImpl());
         try {
             runREPL();
         } finally {
