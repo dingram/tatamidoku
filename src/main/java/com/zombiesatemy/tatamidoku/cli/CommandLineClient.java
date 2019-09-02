@@ -12,6 +12,8 @@ import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 public final class CommandLineClient {
     private static final int NO_COMMAND = 0;
@@ -88,14 +90,39 @@ public final class CommandLineClient {
 
     private boolean interpretCommand(String input) {
         try {
-            if (input.equals("exit")) {
-                return false;
-            } else if (input.equals("print")) {
-                mRenderer.render(mGameState);
-            } else {
-              mWriter.format("ERROR: Unknown command \"%s\"\n", input);
+            final Scanner scanner = new Scanner(input);
+            final String command = scanner.next();
+            switch (command) {
+                case "exit":
+                    return false;
+                case "print":
+                    mRenderer.render(mGameState);
+                    break;
+                case "set": {
+                    int column = scanner.nextInt();
+                    int row = scanner.nextInt();
+                    int value = scanner.nextInt();
+                    mGameState.setPlacement(mGameState.getPlacement().withValueAt(column, row, value));
+                    break;
+                }
+                case "clear": {
+                    if (scanner.hasNext()) {
+                        int column = scanner.nextInt();
+                        int row = scanner.nextInt();
+                        mGameState.setPlacement(mGameState.getPlacement().withNoValueAt(column, row));
+                    } else {
+                        // Reset the whole thing.
+                        mGameState.setPlacement(PlacementImpl.fromSideLength(mGameState.getLayout().getSideLength()));
+                    }
+                    break;
+                }
+                default:
+                    mWriter.format("ERROR: Unknown command \"%s\"\n", command);
+                    break;
             }
             mWriter.flush();
+        } catch (NoSuchElementException e) {
+            mWriter.format("ERROR: Malformed command \"%s\"\n", input);
         } catch (Exception e) {
             mWriter.println("UNCAUGHT ERROR");
             e.printStackTrace(mWriter);
