@@ -1,5 +1,7 @@
 package com.zombiesatemy.tatamidoku.game;
 
+import java.util.List;
+
 public class GameState {
     private Layout mLayout;
     private Placement mPlacement;
@@ -53,6 +55,16 @@ public class GameState {
     }
 
     private boolean validateGroups(int[][] values) {
+        List<Layout.Group> groups = getLayout().getGroups();
+        for (final Layout.Group group : groups) {
+            final int[] counts = new int[group.getSize()];
+            for (final CellCoordinate cellCoordinate : group.getCellCoordinates()) {
+                final int value = values[cellCoordinate.getColumn()][cellCoordinate.getRow()];
+                if (value > 0 && counts[value - 1]++ > 0) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
 }
