@@ -13,5 +13,6 @@ public interface Layout {
         int getFirstRow();
         boolean isVertical();
         int getSize();
+        List<CellCoordinate> getCellCoordinates();
     }
 }
