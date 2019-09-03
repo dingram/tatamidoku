@@ -106,6 +106,16 @@ public final class CommandLineClient {
                     int column = scanner.nextInt();
                     int row = scanner.nextInt();
                     int value = scanner.nextInt();
+                    if (value < 1 || value > mGameState.getLayout().getGroupSize()) {
+                        mWriter.println(
+                                new AttributedStringBuilder()
+                                        .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED).bold())
+                                        .append(String.valueOf(value))
+                                        .append(" is not a valid value.")
+                                        .toAnsi(mTerminal)
+                        );
+                        break;
+                    }
                     mGameState.setPlacement(prevPlacement.withValueAt(column, row, value));
                     if (!mGameState.isValid()) {
                         mWriter.println(
