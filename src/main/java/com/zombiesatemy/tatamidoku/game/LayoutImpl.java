@@ -8,7 +8,7 @@ public class LayoutImpl implements Layout {
     private final int mGroupCount;
     private final int mSideLength;
 
-    public LayoutImpl(int groupSize, int groupCount) {
+    LayoutImpl(int groupSize, int groupCount) {
         mGroupSize = groupSize;
         mGroupCount = groupCount;
         mSideLength = groupCount * groupSize;

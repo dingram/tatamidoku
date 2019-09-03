@@ -1,7 +1,8 @@
 package com.zombiesatemy.tatamidoku.cli;
 
 import com.zombiesatemy.tatamidoku.game.GameState;
-import com.zombiesatemy.tatamidoku.game.LayoutImpl;
+import com.zombiesatemy.tatamidoku.game.Layout;
+import com.zombiesatemy.tatamidoku.game.LayoutGenerator;
 import com.zombiesatemy.tatamidoku.game.Placement;
 import com.zombiesatemy.tatamidoku.game.PlacementImpl;
 import org.jline.reader.EndOfFileException;
@@ -50,15 +51,19 @@ public final class CommandLineClient {
     private void startREPL() throws Exception {
         mRenderer = new TextRenderer(mTerminal);
         mGameState = new GameState();
-        final LayoutImpl layout = new LayoutImpl(3, 2);
-        mGameState.setLayout(layout);
-        mGameState.setPlacement(PlacementImpl.fromSideLength(layout.getSideLength()));
+        resetLayout(3, 2);
         try {
             runREPL();
         } finally {
         }
         mWriter.println("Farewell!");
         mWriter.flush();
+    }
+
+    private void resetLayout(int groupSize, int groupCount) {
+        final Layout layout = LayoutGenerator.generateGroupless(groupSize, groupCount);
+        mGameState.setLayout(layout);
+        mGameState.setPlacement(PlacementImpl.fromSideLength(layout.getSideLength()));
     }
 
     private void runREPL() {
@@ -101,6 +106,29 @@ public final class CommandLineClient {
                     return false;
                 case "print":
                     mRenderer.render(mGameState);
+                    break;
+                case "new":
+                    int groupSize = mGameState.getLayout().getGroupSize();
+                    int groupCount = mGameState.getLayout().getGroupCount();
+                    if (scanner.hasNext()) {
+                        groupSize = scanner.nextInt();
+                        groupCount = scanner.nextInt();
+                        if (groupSize < 3) {
+                            printError("Minimum group size is 3");
+                            break;
+                        } else if (groupSize > 5) {
+                            printError("Maximum group size is 5");
+                            break;
+                        }
+                        if (groupCount < 2) {
+                            printError("Minimum group size is 2");
+                            break;
+                        } else if (groupCount > 3) {
+                            printError("Maximum group count is 3");
+                            break;
+                        }
+                    }
+                    resetLayout(groupSize, groupCount);
                     break;
                 case "set": {
                     int column = scanner.nextInt();
