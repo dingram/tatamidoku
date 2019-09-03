@@ -106,24 +106,23 @@ public final class CommandLineClient {
                     int column = scanner.nextInt();
                     int row = scanner.nextInt();
                     int value = scanner.nextInt();
-                    if (value < 1 || value > mGameState.getLayout().getGroupSize()) {
-                        mWriter.println(
-                                new AttributedStringBuilder()
-                                        .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED).bold())
-                                        .append(String.valueOf(value))
-                                        .append(" is not a valid value.")
-                                        .toAnsi(mTerminal)
-                        );
+                    final Layout layout = mGameState.getLayout();
+                    if (value < 1 || value > layout.getGroupSize()) {
+                        printError("%d is not a valid value.", value);
+                        break;
+                    }
+                    final int sideLength = layout.getSideLength();
+                    if (column < 0 || column >= sideLength) {
+                        printError("%d is not a valid column (must be 0-%d).", column, sideLength - 1);
+                        break;
+                    }
+                    if (row < 0 || row >= sideLength) {
+                        printError("%d is not a valid row (must be 0-%d).", row, sideLength - 1);
                         break;
                     }
                     mGameState.setPlacement(prevPlacement.withValueAt(column, row, value));
                     if (!mGameState.isValid()) {
-                        mWriter.println(
-                                new AttributedStringBuilder()
-                                        .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED).bold())
-                                        .append("Invalid move.")
-                                        .toAnsi(mTerminal)
-                        );
+                        printError("Invalid move.");
                         mGameState.setPlacement(prevPlacement);
                     }
                     break;
@@ -132,6 +131,15 @@ public final class CommandLineClient {
                     if (scanner.hasNext()) {
                         int column = scanner.nextInt();
                         int row = scanner.nextInt();
+                        final int sideLength = mGameState.getLayout().getSideLength();
+                        if (column < 0 || column >= sideLength) {
+                            printError("%d is not a valid column (must be 0-%d).", column, sideLength - 1);
+                            break;
+                        }
+                        if (row < 0 || row >= sideLength) {
+                            printError("%d is not a valid row (must be 0-%d).", row, sideLength - 1);
+                            break;
+                        }
                         mGameState.setPlacement(prevPlacement.withNoValueAt(column, row));
                     } else {
                         // Reset the whole thing.
@@ -140,18 +148,32 @@ public final class CommandLineClient {
                     break;
                 }
                 default:
-                    mWriter.format("ERROR: Unknown command \"%s\"\n", command);
+                    printError("Unknown command \"%s\"", command);
                     break;
             }
             mWriter.flush();
         } catch (NoSuchElementException e) {
-            mWriter.format("ERROR: Malformed command \"%s\"\n", input);
+            printError("Malformed command \"%s\"", input);
         } catch (Exception e) {
-            mWriter.println("UNCAUGHT ERROR");
+            printError("UNCAUGHT EXCEPTION");
             e.printStackTrace(mWriter);
             mWriter.flush();
         }
         return true;
     }
 
+    private void printError(String s) {
+        mWriter.println(
+                new AttributedStringBuilder()
+                        .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED).bold())
+                        .append("ERROR: ")
+                        .append(s)
+                        .toAnsi(mTerminal)
+        );
+        mWriter.flush();
+    }
+
+    private void printError(String s, Object... values) {
+        printError(String.format(s, values));
+    }
 }
