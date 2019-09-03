@@ -1,5 +1,6 @@
 package com.zombiesatemy.tatamidoku.game;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LayoutImpl implements Layout {
@@ -30,6 +31,6 @@ public class LayoutImpl implements Layout {
 
     @Override
     public List<Group> getGroups() {
-        return null;
+        return new ArrayList<>();
     }
 }
