@@ -1,5 +1,6 @@
 package com.zombiesatemy.tatamidoku.game;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameState {
@@ -26,7 +27,10 @@ public class GameState {
         final int[][] values = getPlacement().getAllValuesCopy();
         final int groupSize = getLayout().getGroupSize();
         final int maxPerColumn = getLayout().getGroupCount();
-        return validateColumns(values, groupSize, maxPerColumn) && validateRows(values, groupSize, maxPerColumn) && validateGroups(values);
+        return validateColumns(values, groupSize, maxPerColumn)
+                && validateRows(values, groupSize, maxPerColumn)
+                && validateNeighbours(values)
+                && validateGroups(values);
     }
 
     private boolean validateColumns(int[][] values, int groupSize, int maxPerColumn) {
@@ -48,6 +52,42 @@ public class GameState {
             for (final int value : column) {
                 if (value > 0 && ++counts[value - 1] > maxPerColumn) {
                     return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public List<CellCoordinate> getOrthogonalNeighbours(int col, int row) {
+        final int sideLength = getLayout().getSideLength();
+        List<CellCoordinate> result = new ArrayList<>(4);
+        if (col > 0) {
+            result.add(new CellCoordinate(col - 1, row));
+        }
+        if (row > 0) {
+            result.add(new CellCoordinate(col, row - 1));
+        }
+        if (col < sideLength - 1) {
+            result.add(new CellCoordinate(col + 1, row));
+        }
+        if (row < sideLength - 1) {
+            result.add(new CellCoordinate(col, row + 1));
+        }
+        return result;
+    }
+
+    private boolean validateNeighbours(int[][] values) {
+        for (int col = 0, colCount = values.length; col < colCount; ++col) {
+            for (int row = 0, rowCount = values[col].length; row < rowCount; ++row) {
+                final int value = values[col][row];
+                if (value <= 0) {
+                    continue;
+                }
+                List<CellCoordinate> neighbours = getOrthogonalNeighbours(col, row);
+                for (final CellCoordinate neighbour : neighbours) {
+                    if (values[neighbour.getColumn()][neighbour.getRow()] == value) {
+                        return false;
+                    }
                 }
             }
         }
