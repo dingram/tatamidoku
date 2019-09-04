@@ -101,7 +101,7 @@ public final class CommandLineClient {
             final Scanner scanner = new Scanner(input);
             final String command = scanner.next();
             final Placement prevPlacement = mGameState.getPlacement();
-            switch (command) {
+            switch (command.toLowerCase()) {
                 case "exit":
                     return false;
                 case "print":
