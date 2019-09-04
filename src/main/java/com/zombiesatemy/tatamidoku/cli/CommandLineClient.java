@@ -105,7 +105,11 @@ public final class CommandLineClient {
                 case "exit":
                     return false;
                 case "print":
-                    mRenderer.render(mGameState);
+                    mRenderer.render(mGameState, false);
+                    break;
+                case "printgroups":
+                case "print_groups":
+                    mRenderer.render(mGameState, true);
                     break;
                 case "new":
                     int groupSize = mGameState.getLayout().getGroupSize();

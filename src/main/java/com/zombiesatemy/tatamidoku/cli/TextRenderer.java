@@ -1,6 +1,7 @@
 package com.zombiesatemy.tatamidoku.cli;
 
 import com.zombiesatemy.tatamidoku.game.GameState;
+import com.zombiesatemy.tatamidoku.game.Layout;
 import com.zombiesatemy.tatamidoku.game.Placement;
 import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStringBuilder;
@@ -50,7 +51,7 @@ public class TextRenderer {
         mTerminal = terminal;
     }
 
-    public void render(GameState gameState) {
+    public void render(GameState gameState, boolean renderGroupId) {
         final PrintWriter writer = mTerminal.writer();
         final AttributedStringBuilder builder = new AttributedStringBuilder();
 
@@ -59,8 +60,9 @@ public class TextRenderer {
                 .style(AttributedStyle.DEFAULT)
                 .append("\n");
 
-        final int sideLen = gameState.getLayout().getSideLength();
+        final Layout layout = gameState.getLayout();
         final Placement placement = gameState.getPlacement();
+        final int sideLen = layout.getSideLength();
         for (int y = 0; y < sideLen; ++y) {
             // border above cell
             for (int x = 0; x < sideLen; ++x) {
@@ -94,12 +96,15 @@ public class TextRenderer {
                     builder.append(V_LINE_LIGHT);
                 }
 
+                final char groupId = layout.getGroupIdAt(x, y);
                 final int v = placement.getValueAt(x, y);
-                if (v > 0) {
-                    builder.append(" ").append(String.valueOf(v)).append(" ");
+                final String cellContents;
+                if (renderGroupId) {
+                    cellContents = groupId == 0 ? "⚠" : String.valueOf(groupId);
                 } else {
-                    builder.append("   ");
+                    cellContents = v == 0 ? " " : String.valueOf(v);
                 }
+                builder.append(" ").append(cellContents).append(" ");
                 if (x == sideLen - 1) {
                     builder.append(V_LINE_HEAVY);
                 }
