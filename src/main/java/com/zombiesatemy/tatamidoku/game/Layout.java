@@ -7,8 +7,10 @@ public interface Layout {
     int getGroupSize();
     int getSideLength();
     List<Group> getGroups();
+    char getGroupIdAt(int column, int row);
 
     interface Group {
+        char getId();
         int getFirstColumn();
         int getFirstRow();
         boolean isVertical();

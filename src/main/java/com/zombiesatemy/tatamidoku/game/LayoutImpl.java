@@ -10,12 +10,31 @@ public class LayoutImpl implements Layout {
     private final int mGroupCount;
     private final List<Group> mGroups;
     private final int mSideLength;
+    private final char[][] mGroupIdCache;
 
     LayoutImpl(int groupSize, int groupCount, List<Group> groups) {
         mGroupSize = groupSize;
         mGroupCount = groupCount;
         mGroups = Collections.unmodifiableList(groups);
         mSideLength = groupCount * groupSize;
+        mGroupIdCache = new char[mSideLength][mSideLength];
+        cacheGroupLookups();
+    }
+
+    private void cacheGroupLookups() {
+        for (final Group group : mGroups) {
+            for (final CellCoordinate cellCoordinate : group.getCellCoordinates()) {
+                if (mGroupIdCache[cellCoordinate.getColumn()][cellCoordinate.getRow()] != 0) {
+                    throw new IllegalStateException(String.format(
+                            "Groups %s and %s overlap at (%d, %d)",
+                            mGroupIdCache[cellCoordinate.getColumn()][cellCoordinate.getRow()],
+                            group.getId(),
+                            cellCoordinate.getColumn(),
+                            cellCoordinate.getRow()));
+                }
+                mGroupIdCache[cellCoordinate.getColumn()][cellCoordinate.getRow()] = group.getId();
+            }
+        }
     }
 
     @Override
@@ -38,17 +57,29 @@ public class LayoutImpl implements Layout {
         return mGroups;
     }
 
+    @Override
+    public char getGroupIdAt(int column, int row) {
+        return mGroupIdCache[column][row];
+    }
+
     static class GroupImpl implements Layout.Group {
+        private final char mId;
         private final int mFirstColumn;
         private final int mFirstRow;
         private final boolean mIsVertical;
         private final int mSize;
 
-        public GroupImpl(int firstColumn, int firstRow, boolean isVertical, int size) {
+        public GroupImpl(char id, int firstColumn, int firstRow, boolean isVertical, int size) {
+            mId = id;
             mFirstColumn = firstColumn;
             mFirstRow = firstRow;
             mIsVertical = isVertical;
             mSize = size;
+        }
+
+        @Override
+        public char getId() {
+            return mId;
         }
 
         @Override
