@@ -37,7 +37,8 @@ public class LayoutGenerator {
                             ));
                         } else if (currentGroupCount != 1) {
                             throw new IllegalStateException(String.format(
-                                    "Found a group of size %d when group size is %d",
+                                    "Found a group %x of size %d when group size is %d",
+                                    (int)prevGroupId,
                                     currentGroupCount,
                                     groupSize
                             ));
@@ -57,7 +58,8 @@ public class LayoutGenerator {
                     ));
                 } else if (currentGroupCount != 1) {
                     throw new IllegalStateException(String.format(
-                            "Found a group of size %d when group size is %d",
+                            "Found a group %x of size %d when group size is %d",
+                            (int)prevGroupId,
                             currentGroupCount,
                             groupSize
                     ));
@@ -66,6 +68,60 @@ public class LayoutGenerator {
             // Reset at the end of the row.
             prevGroupId = 0;
         }
+
+        // Find vertical groups
+        prevGroupId = 0;
+        currentGroupCount = 0;
+        groupStartCol = -1;
+        groupStartRow = -1;
+        for (int x = 0; x < sideLength; ++x) {
+            for (int y = 0; y < sideLength; ++y) {
+                int arrayPos = x + y * sideLength;
+                char currentGroupId = idList[arrayPos];
+                if (currentGroupId == prevGroupId) {
+                    // Continue current group
+                    ++currentGroupCount;
+                } else {
+                    // See if previous group has ended
+                    if (prevGroupId != 0) {
+                        if (currentGroupCount == groupSize) {
+                            groups.add(new LayoutImpl.GroupImpl(prevGroupId, groupStartCol, groupStartRow, true,
+                                                                groupSize
+                            ));
+                        } else if (currentGroupCount != 1) {
+                            throw new IllegalStateException(String.format(
+                                    "Found a group %x of size %d when group size is %d",
+                                    (int)prevGroupId,
+                                    currentGroupCount,
+                                    groupSize
+                            ));
+                        }
+                    }
+                    // Record the start of a new group
+                    prevGroupId = currentGroupId;
+                    currentGroupCount = 1;
+                    groupStartCol = x;
+                    groupStartRow = y;
+                }
+            }
+            if (prevGroupId != 0) {
+                if (currentGroupCount == groupSize) {
+                    groups.add(new LayoutImpl.GroupImpl(prevGroupId, groupStartCol, groupStartRow, true,
+                                                        groupSize
+                    ));
+                } else if (currentGroupCount != 1) {
+                    throw new IllegalStateException(String.format(
+                            "Found a group %x of size %d when group size is %d",
+                            (int)prevGroupId,
+                            currentGroupCount,
+                            groupSize
+                    ));
+                }
+            }
+            // Reset at the end of the row.
+            prevGroupId = 0;
+        }
+
         return groups;
     }
 
@@ -82,6 +138,20 @@ public class LayoutGenerator {
                 ++groupId;
             }
             idList[pos] = groupId;
+        }
+        return new LayoutImpl(groupSize, groupCount, groupsFromIdList(idList, groupSize));
+    }
+
+    public static Layout generateAllVerticalGroups(int groupSize, int groupCount) {
+        final int sideLength = groupSize * groupCount;
+        final char[] idList = new char[sideLength * sideLength];
+        char groupId = 'a';
+        char groupOffset = 0;
+        for (int pos = 0; pos < idList.length; ++pos) {
+            if (pos > 0 && pos % (sideLength * groupSize) == 0) {
+                ++groupOffset;
+            }
+            idList[pos] = (char) ((groupId + pos % sideLength) + groupOffset * sideLength);
         }
         return new LayoutImpl(groupSize, groupCount, groupsFromIdList(idList, groupSize));
     }
