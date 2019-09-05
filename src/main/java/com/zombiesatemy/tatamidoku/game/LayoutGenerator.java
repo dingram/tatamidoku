@@ -25,6 +25,9 @@ public class LayoutGenerator {
             for (int x = 0; x < sideLength; ++x) {
                 int arrayPos = x + y * sideLength;
                 char currentGroupId = idList[arrayPos];
+                if (currentGroupId == 0) {
+                    throw new IllegalArgumentException("Group ID cannot be zero");
+                }
                 if (currentGroupId == prevGroupId) {
                     // Continue current group
                     ++currentGroupCount;
@@ -51,19 +54,18 @@ public class LayoutGenerator {
                     groupStartRow = y;
                 }
             }
-            if (prevGroupId != 0) {
-                if (currentGroupCount == groupSize) {
-                    groups.add(new LayoutImpl.GroupImpl(prevGroupId, groupStartCol, groupStartRow, false,
-                                                        groupSize
-                    ));
-                } else if (currentGroupCount != 1) {
-                    throw new IllegalStateException(String.format(
-                            "Found a group %x of size %d when group size is %d",
-                            (int)prevGroupId,
-                            currentGroupCount,
-                            groupSize
-                    ));
-                }
+            // Add end-of-row group.
+            if (currentGroupCount == groupSize) {
+                groups.add(new LayoutImpl.GroupImpl(prevGroupId, groupStartCol, groupStartRow, false,
+                                                    groupSize
+                ));
+            } else if (currentGroupCount != 1) {
+                throw new IllegalStateException(String.format(
+                        "Found a group %x of size %d when group size is %d",
+                        (int)prevGroupId,
+                        currentGroupCount,
+                        groupSize
+                ));
             }
             // Reset at the end of the row.
             prevGroupId = 0;
@@ -78,6 +80,9 @@ public class LayoutGenerator {
             for (int y = 0; y < sideLength; ++y) {
                 int arrayPos = x + y * sideLength;
                 char currentGroupId = idList[arrayPos];
+                if (currentGroupId == 0) {
+                    throw new IllegalArgumentException("Group ID cannot be zero");
+                }
                 if (currentGroupId == prevGroupId) {
                     // Continue current group
                     ++currentGroupCount;
@@ -104,21 +109,20 @@ public class LayoutGenerator {
                     groupStartRow = y;
                 }
             }
-            if (prevGroupId != 0) {
-                if (currentGroupCount == groupSize) {
-                    groups.add(new LayoutImpl.GroupImpl(prevGroupId, groupStartCol, groupStartRow, true,
-                                                        groupSize
-                    ));
-                } else if (currentGroupCount != 1) {
-                    throw new IllegalStateException(String.format(
-                            "Found a group %x of size %d when group size is %d",
-                            (int)prevGroupId,
-                            currentGroupCount,
-                            groupSize
-                    ));
-                }
+            // Add end-of-column group.
+            if (currentGroupCount == groupSize) {
+                groups.add(new LayoutImpl.GroupImpl(prevGroupId, groupStartCol, groupStartRow, true,
+                                                    groupSize
+                ));
+            } else if (currentGroupCount != 1) {
+                throw new IllegalStateException(String.format(
+                        "Found a group %x of size %d when group size is %d",
+                        (int)prevGroupId,
+                        currentGroupCount,
+                        groupSize
+                ));
             }
-            // Reset at the end of the row.
+            // Reset at the end of the column.
             prevGroupId = 0;
         }
 
@@ -132,7 +136,7 @@ public class LayoutGenerator {
     public static Layout generateAllHorizontalGroups(int groupSize, int groupCount) {
         final int sideLength = groupSize * groupCount;
         final char[] idList = new char[sideLength * sideLength];
-        char groupId = 'a';
+        char groupId = 1;
         for (int pos = 0; pos < idList.length; ++pos) {
             if (pos > 0 && pos % groupSize == 0) {
                 ++groupId;
@@ -145,7 +149,7 @@ public class LayoutGenerator {
     public static Layout generateAllVerticalGroups(int groupSize, int groupCount) {
         final int sideLength = groupSize * groupCount;
         final char[] idList = new char[sideLength * sideLength];
-        char groupId = 'a';
+        char groupId = 1;
         char groupOffset = 0;
         for (int pos = 0; pos < idList.length; ++pos) {
             if (pos > 0 && pos % (sideLength * groupSize) == 0) {

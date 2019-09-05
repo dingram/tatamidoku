@@ -10,6 +10,8 @@ import org.jline.utils.AttributedStyle;
 import java.io.PrintWriter;
 
 public class TextRenderer {
+    private static final char[] PRINTABLE_GROUP_IDS =
+            "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
     private final Terminal mTerminal;
     private static final String CORNER_TL = "┏";
     private static final String CORNER_TR = "┓";
@@ -100,7 +102,7 @@ public class TextRenderer {
                 final int v = placement.getValueAt(x, y);
                 final String cellContents;
                 if (renderGroupId) {
-                    cellContents = groupId == 0 ? "⚠" : String.valueOf(groupId);
+                    cellContents = groupId == 0 ? "⚠" : String.valueOf(PRINTABLE_GROUP_IDS[groupId - 1]);
                 } else {
                     cellContents = v == 0 ? " " : String.valueOf(v);
                 }
