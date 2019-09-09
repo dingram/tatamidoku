@@ -12,41 +12,60 @@ public class TextRenderer {
     private static final char[] PRINTABLE_GROUP_IDS =
             "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
     private final Terminal mTerminal;
-    private static final String CORNER_TL = "┏";
-    private static final String CORNER_TR = "┓";
-    private static final String CORNER_BR = "┛";
-    private static final String CORNER_BL = "┗";
+
+    // Alphabet is, in order:
+    //  • Grid corners: Top left, top right, bottom left, bottom right
+    //  • Grid edges: Top, top light, top heavy, bottom, bottom light, bottom heavy, left, left light, left heavy,
+    //    right, right light, right heavy.
+    //  • Intra-cell lines: Horizontal light, horizontal heavy, vertical light, vertical heavy
+    //  • Intra-cell crosses: counting in binary with 0 = light, 1 = heavy; digit order (top, left, bottom, right). So:
+    //      all light, right heavy, bottom heavy, right and bottom heavy, ...
+    private static final String ALPHABET_LIGHT_HEAVY = "┏┓┗┛━┯┳━┷┻┃┠┣┃┨┫─━│┃┼┾╁╆┽┿╅╈╀╄╂╊╃╇╉╋";
+    private static final String ALPHABET_SINGLE_DOUBLE = "╔╗╚╝═╤╦═╧╩║╟╠║╢╣─═│║┼++++╪++++╫++++╬";
+
+    private static final int CH_CORNER_TL = 0;
+    private static final int CH_CORNER_TR = 1;
+    private static final int CH_CORNER_BL = 2;
+    private static final int CH_CORNER_BR = 3;
+
+    private static final int CH_TOP_EDGE = 4;
+    private static final int CH_TOP_EDGE_V_LIGHT = 5;
+    private static final int CH_TOP_EDGE_V_HEAVY = 6;
+    private static final int CH_BOTTOM_EDGE = 7;
+    private static final int CH_BOTTOM_EDGE_V_LIGHT = 8;
+    private static final int CH_BOTTOM_EDGE_V_HEAVY = 9;
+    private static final int CH_LEFT_EDGE = 10;
+    private static final int CH_LEFT_EDGE_H_LIGHT = 11;
+    private static final int CH_LEFT_EDGE_H_HEAVY = 12;
+    private static final int CH_RIGHT_EDGE = 13;
+    private static final int CH_RIGHT_EDGE_H_LIGHT = 14;
+    private static final int CH_RIGHT_EDGE_H_HEAVY = 15;
+
+    private static final int CH_LINE_H_LIGHT = 16;
+    private static final int CH_LINE_H_HEAVY = 17;
+    private static final int CH_LINE_V_LIGHT = 18;
+    private static final int CH_LINE_V_HEAVY = 19;
+
+    private static final int CH_CROSSES_FIRST_OFFSET = 20;
+    private static final int CH_CROSS_tlbr = 20;
+    private static final int CH_CROSS_tlbR = 21;
+    private static final int CH_CROSS_tlBr = 22;
+    private static final int CH_CROSS_tlBR = 23;
+    private static final int CH_CROSS_tLbr = 24;
+    private static final int CH_CROSS_tLbR = 25;
+    private static final int CH_CROSS_tLBr = 26;
+    private static final int CH_CROSS_tLBR = 27;
+    private static final int CH_CROSS_Tlbr = 28;
+    private static final int CH_CROSS_TlbR = 29;
+    private static final int CH_CROSS_TlBr = 30;
+    private static final int CH_CROSS_TlBR = 31;
+    private static final int CH_CROSS_TLbr = 32;
+    private static final int CH_CROSS_TLbR = 33;
+    private static final int CH_CROSS_TLBr = 34;
+    private static final int CH_CROSS_TLBR = 35;
 
     private static final String H_LINE_LIGHT = "─";
     private static final String H_LINE_HEAVY = "━";
-    private static final String V_LINE_LIGHT = "│";
-    private static final String V_LINE_HEAVY = "┃";
-
-    private static final String H_EDGE_TOP_LIGHT = "┯";
-    private static final String H_EDGE_TOP_HEAVY = "┳";
-    private static final String H_EDGE_BOTTOM_LIGHT = "┷";
-    private static final String H_EDGE_BOTTOM_HEAVY = "┻";
-    private static final String V_EDGE_LEFT_LIGHT = "┠";
-    private static final String V_EDGE_LEFT_HEAVY = "┣";
-    private static final String V_EDGE_RIGHT_LIGHT = "┨";
-    private static final String V_EDGE_RIGHT_HEAVY = "┫";
-
-    private static final String INSIDE_CROSS_tblr = "┼";
-    private static final String INSIDE_CROSS_tbLr = "┽";
-    private static final String INSIDE_CROSS_tblR = "┾";
-    private static final String INSIDE_CROSS_tbLR = "┿";
-    private static final String INSIDE_CROSS_Tblr = "╀";
-    private static final String INSIDE_CROSS_tBlr = "╁";
-    private static final String INSIDE_CROSS_TBlr = "╂";
-    private static final String INSIDE_CROSS_TbLr = "╃";
-    private static final String INSIDE_CROSS_TblR = "╄";
-    private static final String INSIDE_CROSS_tBLr = "╅";
-    private static final String INSIDE_CROSS_tBlR = "╆";
-    private static final String INSIDE_CROSS_TbLR = "╇";
-    private static final String INSIDE_CROSS_tBLR = "╈";
-    private static final String INSIDE_CROSS_TBLr = "╉";
-    private static final String INSIDE_CROSS_TBlR = "╊";
-    private static final String INSIDE_CROSS_TBLR = "╋";
 
     public TextRenderer(Terminal terminal) {
         mTerminal = terminal;
@@ -73,62 +92,41 @@ public class TextRenderer {
             }
         }
 
-        final String[] crosses = {
-                INSIDE_CROSS_tblr,
-                INSIDE_CROSS_tblR,
-                INSIDE_CROSS_tBlr,
-                INSIDE_CROSS_tBlR,
-                INSIDE_CROSS_tbLr,
-                INSIDE_CROSS_tbLR,
-                INSIDE_CROSS_tBLr,
-                INSIDE_CROSS_tBLR,
-                INSIDE_CROSS_Tblr,
-                INSIDE_CROSS_TblR,
-                INSIDE_CROSS_TBlr,
-                INSIDE_CROSS_TBlR,
-                INSIDE_CROSS_TbLr,
-                INSIDE_CROSS_TbLR,
-                INSIDE_CROSS_TBLr,
-                INSIDE_CROSS_TBLR,
-        };
-
         for (int y = 0; y < sideLen; ++y) {
             // border above cell
             for (int x = 0; x < sideLen; ++x) {
                 if (x == 0 && y == 0) {
-                    builder.append(CORNER_TL);
+                    builder.append(getChar(CH_CORNER_TL));
                 } else if (x == 0) {
-                    builder.append(hBorders[x][y] ? V_EDGE_LEFT_HEAVY : V_EDGE_LEFT_LIGHT);
+                    builder.append(getChar(hBorders[x][y] ? CH_LEFT_EDGE_H_HEAVY : CH_LEFT_EDGE_H_LIGHT));
                 } else if (y == 0) {
-                    builder.append(vBorders[x][y] ? H_EDGE_TOP_HEAVY : H_EDGE_TOP_LIGHT);
+                    builder.append(getChar(vBorders[x][y] ? CH_TOP_EDGE_V_HEAVY : CH_TOP_EDGE_V_LIGHT));
                 } else {
                     // Select the appropriate "cross" glyph.
-                    int crossType = 0;
-                    crossType |= hBorders[x][y] ? 1 : 0; // is right heavy?
-                    crossType |= vBorders[x][y] ? 2 : 0; // is bottom heavy?
-                    crossType |= hBorders[x - 1][y] ? 4 : 0; // is left heavy?
-                    crossType |= vBorders[x][y - 1] ? 8 : 0; // is top heavy?
-                    builder.append(crosses[crossType]);
+                    final char cross = getCross(
+                            vBorders[x][y - 1], hBorders[x - 1][y], vBorders[x][y], hBorders[x][y]
+                    );
+                    builder.append(cross);
                 }
-                if (y == 0 || hBorders[x][y]) {
-                    builder.append(H_LINE_HEAVY + H_LINE_HEAVY + H_LINE_HEAVY);
+                if (y == 0) {
+                    builder.append(generateHorizontalLine(CH_TOP_EDGE));
                 } else {
-                    builder.append(H_LINE_LIGHT + H_LINE_LIGHT + H_LINE_LIGHT);
+                    builder.append(generateHorizontalLine(hBorders[x][y] ? CH_LINE_H_HEAVY : CH_LINE_H_LIGHT));
                 }
             }
             if (y == 0) {
-                builder.append(CORNER_TR);
+                builder.append(getChar(CH_CORNER_TR));
             } else {
-                builder.append(hBorders[sideLen - 1][y] ? V_EDGE_RIGHT_HEAVY : V_EDGE_RIGHT_LIGHT);
+                builder.append(getChar(hBorders[sideLen - 1][y] ? CH_RIGHT_EDGE_H_HEAVY : CH_RIGHT_EDGE_H_LIGHT));
             }
             builder.append("\n");
 
             // cell contents
             for (int x = 0; x < sideLen; ++x) {
-                if (x == 0 || vBorders[x][y]) {
-                    builder.append(V_LINE_HEAVY);
+                if (x == 0) {
+                    builder.append(getChar(CH_LEFT_EDGE));
                 } else {
-                    builder.append(V_LINE_LIGHT);
+                    builder.append(getChar(vBorders[x][y] ? CH_LINE_V_HEAVY : CH_LINE_V_LIGHT));
                 }
 
                 final char groupId = layout.getGroupIdAt(x, y);
@@ -141,7 +139,7 @@ public class TextRenderer {
                 }
                 builder.append(" ").append(cellContents).append(" ");
                 if (x == sideLen - 1) {
-                    builder.append(V_LINE_HEAVY);
+                    builder.append(getChar(CH_RIGHT_EDGE));
                 }
             }
             builder.append("\n");
@@ -150,16 +148,35 @@ public class TextRenderer {
             if (y == sideLen - 1) {
                 for (int x = 0; x < sideLen; ++x) {
                     if (x == 0) {
-                        builder.append(CORNER_BL);
+                        builder.append(getChar(CH_CORNER_BL));
                     } else {
-                        builder.append(vBorders[x][y] ? H_EDGE_BOTTOM_HEAVY : H_EDGE_BOTTOM_LIGHT);
+                        builder.append(getChar(vBorders[x][y] ? CH_BOTTOM_EDGE_V_HEAVY : CH_BOTTOM_EDGE_V_LIGHT));
                     }
-                    builder.append(H_LINE_HEAVY + H_LINE_HEAVY + H_LINE_HEAVY);
+                    builder.append(generateHorizontalLine(CH_BOTTOM_EDGE));
                 }
-                builder.append(CORNER_BR + "\n");
+                builder.append(getChar(CH_CORNER_BR)).append("\n");
             }
         }
 
         writer.println(builder.toAnsi(mTerminal));
+    }
+
+    private char getCross(boolean topHeavy, boolean leftHeavy, boolean bottomHeavy,
+                          boolean rightHeavy) {
+        int crossType = 0;
+        crossType |= rightHeavy ? 1 : 0;
+        crossType |= bottomHeavy ? 2 : 0;
+        crossType |= leftHeavy ? 4 : 0;
+        crossType |= topHeavy ? 8 : 0;
+        return getChar(CH_CROSSES_FIRST_OFFSET + crossType);
+    }
+
+    private char getChar(int offset) {
+        return ALPHABET_LIGHT_HEAVY.charAt(offset);
+    }
+
+    private String generateHorizontalLine(int offset) {
+        final char c = getChar(offset);
+        return new String(new char[]{c, c, c});
     }
 }
