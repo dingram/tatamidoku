@@ -2,7 +2,9 @@ package com.zombiesatemy.tatamidoku.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LayoutGenerator {
     private static List<Layout.Group> groupsFromIdList(char[] idList, int groupSize) {
@@ -143,7 +145,7 @@ public class LayoutGenerator {
             }
             idList[pos] = groupId;
         }
-        return new LayoutImpl(groupSize, groupCount, groupsFromIdList(idList, groupSize));
+        return fromGroupIds(idList, groupSize, groupCount);
     }
 
     public static Layout generateAllVerticalGroups(int groupSize, int groupCount) {
@@ -157,6 +159,36 @@ public class LayoutGenerator {
             }
             idList[pos] = (char) ((groupId + pos % sideLength) + groupOffset * sideLength);
         }
-        return new LayoutImpl(groupSize, groupCount, groupsFromIdList(idList, groupSize));
+        return fromGroupIds(idList, groupSize, groupCount);
+    }
+
+    public static Layout fromGroupIds(char[] groupIds) {
+        final int sideLength = (int) Math.sqrt(groupIds.length);
+        final Map<Character, Integer> groupSizes = new HashMap<>();
+        for (final char groupId : groupIds) {
+            int count = groupSizes.getOrDefault(groupId, 0);
+            groupSizes.put(groupId, count + 1);
+        }
+        int groupSize = 0;
+        for (final Map.Entry<Character, Integer> groupSizeInfo : groupSizes.entrySet()) {
+            if (groupSize == 0) {
+                groupSize = groupSizeInfo.getValue();
+            } else if (groupSize != groupSizeInfo.getValue()) {
+                throw new IllegalStateException(String.format(
+                        "Group %c has size %d, which differs from detected size %d",
+                        groupSizeInfo.getKey(), groupSizeInfo.getValue(), groupSize));
+            }
+        }
+        int groupCount = sideLength / groupSize;
+        if (sideLength != groupCount * groupSize) {
+            throw new IllegalStateException(String.format(
+                    "Inconsistent layout! Side length %d != group size %d * group count %d",
+                    sideLength, groupSize, groupCount));
+        }
+        return fromGroupIds(groupIds, groupSize, groupCount);
+    }
+
+    public static Layout fromGroupIds(char[] groupIds, int groupSize, int groupCount) {
+        return new LayoutImpl(groupSize, groupCount, groupsFromIdList(groupIds, groupSize));
     }
 }
