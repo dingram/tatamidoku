@@ -169,10 +169,10 @@ public final class CommandLineClient {
                         printError("%d is not a valid row (must be 0-%d).", row, sideLength - 1);
                         break;
                     }
-                    mGameState.setPlacement(prevPlacement.withValueAt(column, row, value));
+                    mGameState.pushPlacement(prevPlacement.withValueAt(column, row, value));
                     if (!mGameState.isValid()) {
                         printError("Invalid move.");
-                        mGameState.setPlacement(prevPlacement);
+                        mGameState.popPlacement();
                     }
                     break;
                 }
@@ -189,13 +189,20 @@ public final class CommandLineClient {
                             printError("%d is not a valid row (must be 0-%d).", row, sideLength - 1);
                             break;
                         }
-                        mGameState.setPlacement(prevPlacement.withNoValueAt(column, row));
+                        mGameState.pushPlacement(prevPlacement.withNoValueAt(column, row));
                     } else {
                         // Reset the whole thing.
                         mGameState.setPlacement(PlacementImpl.fromSideLength(mGameState.getLayout().getSideLength()));
                     }
                     break;
                 }
+                case "undo":
+                    if (mGameState.canPop()) {
+                        mGameState.popPlacement();
+                    } else {
+                        printError("Nothing to undo.");
+                    }
+                    break;
                 default:
                     printError("Unknown command \"%s\"", command);
                     break;

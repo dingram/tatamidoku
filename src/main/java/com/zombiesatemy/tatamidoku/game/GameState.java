@@ -1,26 +1,50 @@
 package com.zombiesatemy.tatamidoku.game;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class GameState {
     private Layout mLayout;
-    private Placement mPlacement;
+    private final Deque<Placement> mPlacement = new ArrayDeque<>();
+
+    public void reset() {
+        mLayout = null;
+        mPlacement.clear();
+    }
 
     public Layout getLayout() {
         return mLayout;
     }
 
     public void setLayout(Layout layout) {
+        reset();
         mLayout = layout;
     }
 
     public Placement getPlacement() {
-        return mPlacement;
+        return mPlacement.peek();
+    }
+
+    public void pushPlacement(Placement placement) {
+        mPlacement.push(placement);
+    }
+
+    public Placement popPlacement() {
+        if (!canPop()) {
+            throw new IllegalStateException("No more Placements to pop");
+        }
+        return mPlacement.pop();
+    }
+
+    public boolean canPop() {
+        return mPlacement.size() > 1;
     }
 
     public void setPlacement(Placement placement) {
-        mPlacement = placement;
+        mPlacement.clear();
+        mPlacement.push(placement);
     }
 
     public boolean isValid() {
