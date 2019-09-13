@@ -17,6 +17,32 @@ public final class PlacementImpl implements Placement {
         return new PlacementImpl(values);
     }
 
+    public static Placement fromValues(String values) {
+        final int ZERO = '0';
+        return fromValues(values.chars().map(i -> {
+            if (i == '.') {
+                return 0;
+            }
+            if (i < ZERO || i > ZERO + 9) {
+                throw new IllegalArgumentException(i + " is out of range");
+            }
+            return i - ZERO;
+        }).toArray());
+    }
+
+    public static Placement fromValues(int[] values) {
+        // Ensure that the array is square.
+        final int sideLength = (int) Math.sqrt(values.length);
+        if (values.length != sideLength * sideLength) {
+            throw new IllegalArgumentException("Values must be a square array");
+        }
+        int[][] valueMatrix = new int[sideLength][sideLength];
+        for (int i = 0; i < values.length; i++) {
+            valueMatrix[i % sideLength][i / sideLength] = values[i];
+        }
+        return fromValuesWithoutCopy(valueMatrix);
+    }
+
     public static Placement fromValues(int[][] values) {
         // Ensure that the array is square.
         for (final int[] column : values) {

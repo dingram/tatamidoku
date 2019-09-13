@@ -162,6 +162,10 @@ public class LayoutGenerator {
         return fromGroupIds(idList, groupSize, groupCount);
     }
 
+    public static Layout fromGroupIds(String groupIds) {
+        return fromGroupIds(groupIds.toCharArray());
+    }
+
     public static Layout fromGroupIds(char[] groupIds) {
         final int sideLength = (int) Math.sqrt(groupIds.length);
         final Map<Character, Integer> groupSizes = new HashMap<>();
@@ -186,6 +190,10 @@ public class LayoutGenerator {
                     sideLength, groupSize, groupCount));
         }
         return fromGroupIds(groupIds, groupSize, groupCount);
+    }
+
+    public static Layout fromGroupIds(String groupIds, int groupSize, int groupCount) {
+        return fromGroupIds(groupIds.toCharArray(), groupSize, groupCount);
     }
 
     public static Layout fromGroupIds(char[] groupIds, int groupSize, int groupCount) {
