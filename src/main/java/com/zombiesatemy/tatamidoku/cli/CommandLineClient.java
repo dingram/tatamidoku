@@ -66,6 +66,18 @@ public final class CommandLineClient {
         mGameState.setPlacement(PlacementImpl.fromSideLength(layout.getSideLength()));
     }
 
+    private void resetLayoutToPuzzle(int puzzlenum) {
+        String[][] puzzles = {
+                {
+                        "aaabbbcdddefcgggefchhhefiiijjjkkklll",
+                        "..2.3...3......3...3.13221321..21..1",
+                },
+        };
+        final Layout layout = LayoutGenerator.fromGroupIds(puzzles[puzzlenum][0]);
+        mGameState.setLayout(layout);
+        mGameState.setPlacement(PlacementImpl.fromValues(puzzles[puzzlenum][1]));
+    }
+
     private void runREPL() {
         while (true) {
             switch (readAndInterpretLine()) {
@@ -134,6 +146,11 @@ public final class CommandLineClient {
                     }
                     resetLayout(groupSize, groupCount);
                     break;
+                case "load": {
+                    int puzzleNum = scanner.nextInt();
+                    resetLayoutToPuzzle(puzzleNum);
+                    break;
+                }
                 case "set": {
                     int column = scanner.nextInt();
                     int row = scanner.nextInt();
