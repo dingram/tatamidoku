@@ -19,6 +19,7 @@ public class LayoutGenerator {
         List<Layout.Group> groups = new ArrayList<>(idList.length);
 
         // Find horizontal groups
+        char minGroupId = idList[0];
         char prevGroupId = 0;
         int currentGroupCount = 0;
         int groupStartCol = -1;
@@ -30,6 +31,10 @@ public class LayoutGenerator {
                 if (currentGroupId == 0) {
                     throw new IllegalArgumentException("Group ID cannot be zero");
                 }
+                if (currentGroupId < minGroupId) {
+                    throw new IllegalArgumentException("First group ID must be the lowest");
+                }
+                currentGroupId = (char) (1 + currentGroupId - minGroupId);
                 if (currentGroupId == prevGroupId) {
                     // Continue current group
                     ++currentGroupCount;
@@ -85,6 +90,10 @@ public class LayoutGenerator {
                 if (currentGroupId == 0) {
                     throw new IllegalArgumentException("Group ID cannot be zero");
                 }
+                if (currentGroupId < minGroupId) {
+                    throw new IllegalArgumentException("First group ID must be the lowest");
+                }
+                currentGroupId = (char) (1 + currentGroupId - minGroupId);
                 if (currentGroupId == prevGroupId) {
                     // Continue current group
                     ++currentGroupCount;
