@@ -193,10 +193,14 @@ public final class CommandLineClient {
                             printError("%d is not a valid row (must be 0-%d).", row, sideLength - 1);
                             break;
                         }
+                        if (mGameState.getOriginalPlacement().getValueAt(column, row) != 0) {
+                            printError("Cannot clear an original value.");
+                            break;
+                        }
                         mGameState.pushPlacement(prevPlacement.withNoValueAt(column, row));
                     } else {
                         // Reset the whole thing.
-                        mGameState.setPlacement(PlacementImpl.fromSideLength(mGameState.getLayout().getSideLength()));
+                        mGameState.setPlacement(mGameState.getOriginalPlacement());
                     }
                     break;
                 }

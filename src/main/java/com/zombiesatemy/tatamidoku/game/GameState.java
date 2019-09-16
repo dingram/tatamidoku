@@ -23,6 +23,10 @@ public class GameState {
         mLayout = layout;
     }
 
+    public Placement getOriginalPlacement() {
+        return mPlacement.peekLast();
+    }
+
     public Placement getPlacement() {
         return mPlacement.peek();
     }
