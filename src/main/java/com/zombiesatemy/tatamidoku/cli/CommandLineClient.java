@@ -145,10 +145,12 @@ public final class CommandLineClient {
                         }
                     }
                     resetLayout(groupSize, groupCount);
+                    mRenderer.render(mGameState, false);
                     break;
                 case "load": {
                     int puzzleNum = scanner.nextInt();
                     resetLayoutToPuzzle(puzzleNum);
+                    mRenderer.render(mGameState, false);
                     break;
                 }
                 case "set": {
@@ -174,7 +176,9 @@ public final class CommandLineClient {
                         break;
                     }
                     mGameState.pushPlacement(prevPlacement.withValueAt(column, row, value));
-                    if (!mGameState.isValid()) {
+                    if (mGameState.isValid()) {
+                        mRenderer.render(mGameState, false);
+                    } else {
                         printError("Invalid move.");
                         mGameState.popPlacement();
                     }
@@ -202,11 +206,13 @@ public final class CommandLineClient {
                         // Reset the whole thing.
                         mGameState.setPlacement(mGameState.getOriginalPlacement());
                     }
+                    mRenderer.render(mGameState, false);
                     break;
                 }
                 case "undo":
                     if (mGameState.canPop()) {
                         mGameState.popPlacement();
+                        mRenderer.render(mGameState, false);
                     } else {
                         printError("Nothing to undo.");
                     }
