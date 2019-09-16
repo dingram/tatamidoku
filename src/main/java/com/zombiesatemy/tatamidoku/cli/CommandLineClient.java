@@ -3,8 +3,10 @@ package com.zombiesatemy.tatamidoku.cli;
 import com.zombiesatemy.tatamidoku.game.GameState;
 import com.zombiesatemy.tatamidoku.game.Layout;
 import com.zombiesatemy.tatamidoku.game.LayoutGenerator;
+import com.zombiesatemy.tatamidoku.game.Move;
 import com.zombiesatemy.tatamidoku.game.Placement;
 import com.zombiesatemy.tatamidoku.game.PlacementImpl;
+import com.zombiesatemy.tatamidoku.game.RemainingGroupMemberSolver;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -16,7 +18,9 @@ import org.jline.utils.AttributedStyle;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Scanner;
 
 public final class CommandLineClient {
@@ -215,6 +219,21 @@ public final class CommandLineClient {
                         mRenderer.render(mGameState, false);
                     } else {
                         printError("Nothing to undo.");
+                    }
+                    break;
+                case "hint":
+                    RemainingGroupMemberSolver solver = new RemainingGroupMemberSolver();
+                    Optional<Collection<Move>> moves =
+                            solver.getPossibleNextMoves(mGameState.getLayout(), mGameState.getPlacement());
+                    if (!moves.isPresent()) {
+                        printError("The current layout and placement are impossible to solve.");
+                        break;
+                    } else if (moves.get().isEmpty()) {
+                        printError("No hints available.");
+                        break;
+                    }
+                    for (final Move move : moves.get()) {
+                        mWriter.println("Possible move: " + move.toString());
                     }
                     break;
                 default:
