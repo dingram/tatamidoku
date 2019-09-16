@@ -58,6 +58,11 @@ public class LayoutImpl implements Layout {
     }
 
     @Override
+    public char getGroupIdAt(CellCoordinate coordinate) {
+        return getGroupIdAt(coordinate.getColumn(), coordinate.getRow());
+    }
+
+    @Override
     public char getGroupIdAt(int column, int row) {
         return mGroupIdCache[column][row];
     }

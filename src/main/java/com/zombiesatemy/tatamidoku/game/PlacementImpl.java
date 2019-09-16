@@ -64,6 +64,11 @@ public final class PlacementImpl implements Placement {
     }
 
     @Override
+    public int getValueAt(CellCoordinate coordinate) {
+        return getValueAt(coordinate.getColumn(), coordinate.getRow());
+    }
+
+    @Override
     public int getValueAt(int column, int row) {
         return mValues[column][row];
     }
@@ -74,8 +79,18 @@ public final class PlacementImpl implements Placement {
     }
 
     @Override
+    public Placement withNoValueAt(CellCoordinate coordinate) {
+        return withValueAt(coordinate, 0);
+    }
+
+    @Override
     public Placement withNoValueAt(int column, int row) {
         return withValueAt(column, row, 0);
+    }
+
+    @Override
+    public Placement withValueAt(CellCoordinate coordinate, int value) {
+        return withValueAt(coordinate.getColumn(), coordinate.getRow(), value);
     }
 
     @Override

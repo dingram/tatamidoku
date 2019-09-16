@@ -8,6 +8,7 @@ public interface Layout {
     int getSideLength();
     List<Group> getGroups();
     char getGroupIdAt(int column, int row);
+    char getGroupIdAt(CellCoordinate coordinate);
 
     interface Group {
         char getId();
