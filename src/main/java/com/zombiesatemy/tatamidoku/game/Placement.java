@@ -11,6 +11,7 @@ public interface Placement {
     Placement withNoValueAt(int column, int row);
     Placement withValueAt(CellCoordinate coordinate, int value);
     Placement withValueAt(int column, int row, int value);
+    Placement withMove(Move move);
 
     class Builder {
         private final int[][] mValues;

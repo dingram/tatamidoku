@@ -99,4 +99,9 @@ public final class PlacementImpl implements Placement {
         values[column][row] = value;
         return fromValuesWithoutCopy(values);
     }
+
+    @Override
+    public Placement withMove(Move move) {
+        return withValueAt(move.getColumn(), move.getRow(), move.getValue());
+    }
 }
