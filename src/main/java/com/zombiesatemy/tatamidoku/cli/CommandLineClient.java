@@ -169,6 +169,10 @@ public final class CommandLineClient {
                         printError("%d is not a valid row (must be 0-%d).", row, sideLength - 1);
                         break;
                     }
+                    if (prevPlacement.getValueAt(column, row) != 0) {
+                        printError("There is already a value there.");
+                        break;
+                    }
                     mGameState.pushPlacement(prevPlacement.withValueAt(column, row, value));
                     if (!mGameState.isValid()) {
                         printError("Invalid move.");
