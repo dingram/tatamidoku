@@ -50,7 +50,7 @@ public class RemainingGroupMemberSolver implements Solver {
             final Layout.Group group = layout.getGroupById(entry.getKey()).get();
             for (final CellCoordinate cc : group.getCellCoordinates()) {
                 if (placement.getValueAt(cc) == 0) {
-                    moves.add(new SolverMove(cc.getColumn(), cc.getRow(), bits.nextClearBit(0) + 1));
+                    moves.add(new SolverMove(this.getClass(), cc.getColumn(), cc.getRow(), bits.nextClearBit(0) + 1));
                 }
             }
         }

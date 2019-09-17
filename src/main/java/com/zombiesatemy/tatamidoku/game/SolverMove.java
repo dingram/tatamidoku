@@ -1,18 +1,25 @@
 package com.zombiesatemy.tatamidoku.game;
 
 public class SolverMove implements Move {
+    private final Class<? extends Solver> mSource;
     private final int mColumn;
     private final int mRow;
     private final int mValue;
 
-    SolverMove(CellCoordinate coordinate, int value) {
-        this(coordinate.getColumn(), coordinate.getRow(), value);
+    SolverMove(Class<? extends Solver> source, CellCoordinate coordinate, int value) {
+        this(source, coordinate.getColumn(), coordinate.getRow(), value);
     }
 
-    SolverMove(int column, int row, int value) {
+    SolverMove(Class<? extends Solver> source, int column, int row, int value) {
+        mSource = source;
         mColumn = column;
         mRow = row;
         mValue = value;
+    }
+
+    @Override
+    public Class<? extends Solver> getSource() {
+        return mSource;
     }
 
     @Override
@@ -37,6 +44,6 @@ public class SolverMove implements Move {
 
     @Override
     public String toString() {
-        return String.format("Place %d at (%d, %d)", mValue, mColumn, mRow);
+        return String.format("%s: Place %d at (%d, %d)", mSource.getSimpleName(), mValue, mColumn, mRow);
     }
 }
