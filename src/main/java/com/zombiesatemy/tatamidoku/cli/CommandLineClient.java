@@ -7,6 +7,7 @@ import com.zombiesatemy.tatamidoku.game.Move;
 import com.zombiesatemy.tatamidoku.game.Placement;
 import com.zombiesatemy.tatamidoku.game.PlacementImpl;
 import com.zombiesatemy.tatamidoku.game.RemainingGroupMemberSolver;
+import com.zombiesatemy.tatamidoku.game.Solver;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -18,7 +19,9 @@ import org.jline.utils.AttributedStyle;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Scanner;
@@ -222,9 +225,7 @@ public final class CommandLineClient {
                     }
                     break;
                 case "hint":
-                    RemainingGroupMemberSolver solver = new RemainingGroupMemberSolver();
-                    Optional<Collection<Move>> moves =
-                            solver.getPossibleNextMoves(mGameState.getLayout(), mGameState.getPlacement());
+                    Optional<Collection<Move>> moves = getPossibleNextMoves();
                     if (!moves.isPresent()) {
                         printError("The current layout and placement are impossible to solve.");
                         break;
@@ -249,6 +250,23 @@ public final class CommandLineClient {
             mWriter.flush();
         }
         return true;
+    }
+
+    private Optional<Collection<Move>> getPossibleNextMoves() {
+        final Solver[] solvers = new Solver[]{
+                new RemainingGroupMemberSolver(),
+        };
+        final Layout layout = mGameState.getLayout();
+        final Placement placement = mGameState.getPlacement();
+        final List<Move> results = new ArrayList<>();
+        for (final Solver solver : solvers) {
+            Optional<Collection<Move>> moves = solver.getPossibleNextMoves(layout, placement);
+            if (!moves.isPresent()) {
+                return Optional.empty();
+            }
+            results.addAll(moves.get());
+        }
+        return Optional.of(results);
     }
 
     private void printError(String s) {
