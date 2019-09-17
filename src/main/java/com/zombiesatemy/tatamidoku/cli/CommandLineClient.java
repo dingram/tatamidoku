@@ -6,7 +6,9 @@ import com.zombiesatemy.tatamidoku.game.LayoutGenerator;
 import com.zombiesatemy.tatamidoku.game.Move;
 import com.zombiesatemy.tatamidoku.game.Placement;
 import com.zombiesatemy.tatamidoku.game.PlacementImpl;
+import com.zombiesatemy.tatamidoku.game.RemainingColumnMemberSolver;
 import com.zombiesatemy.tatamidoku.game.RemainingGroupMemberSolver;
+import com.zombiesatemy.tatamidoku.game.RemainingRowMemberSolver;
 import com.zombiesatemy.tatamidoku.game.Solver;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -255,7 +257,9 @@ public final class CommandLineClient {
     private Optional<Collection<Move>> getPossibleNextMoves() {
         final Solver[] solvers = new Solver[]{
                 new RemainingGroupMemberSolver(),
-        };
+                new RemainingColumnMemberSolver(),
+                new RemainingRowMemberSolver(),
+                };
         final Layout layout = mGameState.getLayout();
         final Placement placement = mGameState.getPlacement();
         final List<Move> results = new ArrayList<>();
