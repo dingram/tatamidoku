@@ -1,5 +1,7 @@
 package com.zombiesatemy.tatamidoku.game;
 
+import java.util.Objects;
+
 public class SolverMove implements Move {
     private final Class<? extends Solver> mSource;
     private final int mColumn;
@@ -45,5 +47,24 @@ public class SolverMove implements Move {
     @Override
     public String toString() {
         return String.format("%s: Place %d at (%d, %d)", mSource.getSimpleName(), mValue, mColumn, mRow);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Move)) {
+            return false;
+        }
+        final Move that = (Move) o;
+        return mColumn == that.getColumn() &&
+                mRow == that.getRow() &&
+                mValue == that.getValue();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mColumn, mRow, mValue);
     }
 }

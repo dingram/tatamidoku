@@ -104,4 +104,21 @@ public final class PlacementImpl implements Placement {
     public Placement withMove(Move move) {
         return withValueAt(move.getColumn(), move.getRow(), move.getValue());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final PlacementImpl placement = (PlacementImpl) o;
+        return Arrays.equals(mValues, placement.mValues);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(mValues);
+    }
 }
