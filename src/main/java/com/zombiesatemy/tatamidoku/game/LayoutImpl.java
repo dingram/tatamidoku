@@ -1,5 +1,7 @@
 package com.zombiesatemy.tatamidoku.game;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -74,6 +76,30 @@ public class LayoutImpl implements Layout {
     }
 
     @Override
+    public Collection<CellCoordinate> getOrthogonalNeighbours(int column, int row) {
+        final int sideLength = getSideLength();
+        List<CellCoordinate> result = new ArrayList<>(4);
+        if (column > 0) {
+            result.add(new CellCoordinate(column - 1, row));
+        }
+        if (row > 0) {
+            result.add(new CellCoordinate(column, row - 1));
+        }
+        if (column < sideLength - 1) {
+            result.add(new CellCoordinate(column + 1, row));
+        }
+        if (row < sideLength - 1) {
+            result.add(new CellCoordinate(column, row + 1));
+        }
+        return Collections.unmodifiableList(result);
+    }
+
+    @Override
+    public Collection<CellCoordinate> getOrthogonalNeighbours(CellCoordinate coordinate) {
+        return getOrthogonalNeighbours(coordinate.getColumn(), coordinate.getRow());
+    }
+
+    @Override
     public char getGroupIdAt(CellCoordinate coordinate) {
         return getGroupIdAt(coordinate.getColumn(), coordinate.getRow());
     }
@@ -124,7 +150,7 @@ public class LayoutImpl implements Layout {
         }
 
         @Override
-        public List<CellCoordinate> getCellCoordinates() {
+        public Collection<CellCoordinate> getCellCoordinates() {
             final List<CellCoordinate> coords;
             if (mIsVertical) {
                 coords = IntStream.range(0, mSize)
